@@ -36,6 +36,7 @@ StateMachine = Class{}
 
 function StateMachine:init(states)
 	self.empty = {
+		name = "empty",
 		render = function() end,
 		update = function() end,
 		enter = function() end,
@@ -43,14 +44,22 @@ function StateMachine:init(states)
 	}
 	self.states = states or {} -- [name] -> [function that returns states]
 	self.current = self.empty
+	self.stack = {}
 end
 
-function StateMachine:change(stateName, enterParams)
-	assert(self.states[stateName]) -- state must exist!
-	self.current:exit()
-	self.current = self.states[stateName]()
-	self.current:enter(enterParams)
+function StateMachine:change(stateOrName, enterParams)
+    if type(stateOrName) == "string" then
+        assert(self.states[stateOrName]) -- state must exist!
+        self.current:exit()
+        self.current = self.states[stateOrName]()
+        self.current.name = stateOrName
+    else
+        self.current:exit()
+        self.current = stateOrName
+    end
+    self.current:enter(enterParams)
 end
+
 
 function StateMachine:update(dt)
 	self.current:update(dt)
@@ -58,4 +67,16 @@ end
 
 function StateMachine:render()
 	self.current:render()
+end
+
+function StateMachine:push(stateName, enterParams)
+    table.insert(self.stack, self.current)
+    self:change(stateName, enterParams)
+end
+
+function StateMachine:pop()
+    if #self.stack > 0 then
+        local prevState = table.remove(self.stack)
+        self:change(prevState)
+    end
 end

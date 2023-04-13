@@ -40,6 +40,7 @@ require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
+require 'states/PauseState'
 
 require 'Bird'
 require 'Pipe'
@@ -111,7 +112,8 @@ function love.load()
         ['title'] = function() return TitleScreenState() end,
         ['countdown'] = function() return CountdownState() end,
         ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end
+        ['score'] = function() return ScoreState() end,
+        ['pause'] = function() return PauseState() end
     }
     gStateMachine:change('title')
 
@@ -133,6 +135,15 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
+    if key == 'p' then
+        if gStateMachine.current.name == 'play' then
+            gStateMachine:push('pause', {playState = gStateMachine.current})
+        elseif gStateMachine.current.name == 'pause' then
+            gStateMachine:pop()
+        end
+    end
+    
 end
 
 --[[
@@ -155,6 +166,9 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
+    if gStateMachine.current.name == 'pause' then
+        return
+    end
     if scrolling then
         backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
         groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
