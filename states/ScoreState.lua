@@ -10,6 +10,10 @@
 
 ScoreState = Class{__includes = BaseState}
 
+local GOLD_MEDAL_IMAGE = love.graphics.newImage('medal1.png')
+local SILVER_MEDAL_IMAGE = love.graphics.newImage('medal2.png')
+local BRONZE_MEDAL_IMAGE = love.graphics.newImage('medal3.png')
+
 --[[
     When we enter the score state, we expect to receive the score
     from the play state so we know what to render to the State.
@@ -32,6 +36,15 @@ function ScoreState:render()
 
     love.graphics.setFont(mediumFont)
     love.graphics.printf('Score: ' .. tostring(self.score), 0, 100, VIRTUAL_WIDTH, 'center')
+
+    -- gazouille
+    if (self.score >= 10) then
+        love.graphics.draw(GOLD_MEDAL_IMAGE, VIRTUAL_WIDTH / 2 + 40, 100, 0, 0.1, 0.1)
+    elseif (self.score >= 5) then
+        love.graphics.draw(SILVER_MEDAL_IMAGE, VIRTUAL_WIDTH / 2 + 40, 100, 0, 0.1, 0.1)
+    elseif (self.score >= 1) then
+        love.graphics.draw(BRONZE_MEDAL_IMAGE, VIRTUAL_WIDTH / 2 + 40, 100, 0, 0.1, 0.1)
+    end
 
     love.graphics.printf('Press Enter to Play Again!', 0, 160, VIRTUAL_WIDTH, 'center')
 end
